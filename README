@@ -1,0 +1,64 @@
+hash_translation: A modest DSL for translating hashes
+=====================================================
+
+hash_translation is a DSL similar to Jim Weirich's XML Builder with a modest
+goal: translating from one or more hashes to another.
+
+The need arose from having to collect data from many sources in unique nested
+key/value forms and having to map it to the keys used by my ruby app.
+
+If you are translating from hash a to b, without hash_translation:
+
+  a[:param_a] = b[:other_param_a]
+  a[:param_b] = b[:other_param_b]
+
+With hash_translation:
+
+  a.param_a b.other_param_a
+  a.param_b b.other_param_b
+
+It allows scoping in a block. Without hash_translation:
+
+  c = a[:foo]
+  c[:param_a] = b[:other_param_a]
+  c[:param_b] = b[:other_param_b]
+
+With hash_translation:
+
+  a.foo do
+    a.param_a b.other_param_a
+    a.param_b b.other_param_b
+  end
+
+You can also chain method calls to get deeper into the data structures. Without
+hash_translation:
+
+  a[:foo][:bar][:baz] = b[:so][:down][:the][:path][:we][:go]
+
+With hash_translation:
+
+  a.foo.bar.baz b.so.down.the.path.we.go
+
+It has the following caveats:
+
+  * The keys have to be symbols. If you use a HashWithIndifferentAccess, then
+    string keys are also supported.
+  * The examples above omit the extra code that is required to bind your hashes
+    to hash_translation.
+
+The translate method allows for binding of hashes to hash_translation types:
+
+source_1 = {:this => {:is => {:a => {:source => 'hash'}}}}
+source_2 = {:this => 'is', :another => 'source hash'}
+destination = {:this => {:is => {:the => 'destination hash'}}}
+
+HashTranslation.translate (destination, source_1, source_2) do |d, s1, s2|
+  d.this.is do
+    d.foo s1.this.is.a.source
+    d.bar s2.this
+    d.baz s2.another
+  end
+end
+
+# destination:
+# {:this=>{:is=>{:the=>"destination hash", :bar=>"is", :foo=>"hash", :baz=>"source hash"}}}
