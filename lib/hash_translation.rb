@@ -78,7 +78,9 @@ module HashTranslation
       else
         if args[0]
           @hash[key] = args[0]
-        elsif !@hash[key].kind_of? Hash
+        elsif args.size == 1 && args[0].nil?
+          @hash[key] = nil
+        elsif !@hash[key].kind_of?(Hash)
           @hash[key] = {}
         end
         ancestors_target_me_while_i_run_this! key, &block if block

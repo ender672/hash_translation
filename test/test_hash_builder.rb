@@ -71,6 +71,11 @@ class TestHashBuilder < Test::Unit::TestCase
     assert_equal({:wheres_my_value => {}}, @h.target!)
   end
 
+  def test_nil_value_given_doesnt_create_an_empty_hash
+    @h.ladies_and_gentlemen nil
+    assert_equal({:ladies_and_gentlemen => nil}, @h.target!)
+  end
+
   def test_assign_and_continue
     i = @h.sometimes
     i.feel 'lonely'
@@ -125,3 +130,4 @@ class TestHashBuilder < Test::Unit::TestCase
     )
   end
 end
+
